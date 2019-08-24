@@ -2,7 +2,6 @@ const request = require('request');
 var cron = require('node-cron')
 
 async function fetchPrices(url, exchangeName, responseParser) {
-	console.log(`Fetching ${exchangeName} rates`);
 	try {
 		const response = await fetch(url)
 		responseParser(response)

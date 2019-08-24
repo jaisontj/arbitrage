@@ -31,7 +31,9 @@ async function responseHandler(allResponse) {
 		}
 		//Convert usdt to inr as well
 		if (marketName === 'USDT') {
-			prices['INR'] = {}
+			if (!prices.hasOwnProperty('INR')) {
+				prices['INR'] = {}
+			}
 			prices['INR'][coinName] = {
 				buy: currency_converter.convertUSDToINR(price),
 				sell: currency_converter.convertUSDToINR(price)

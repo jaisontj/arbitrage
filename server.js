@@ -42,24 +42,27 @@ app.get('/arbitrage', (req, res) => {
 	amount = req.query.amount;
 	market = req.query.market;
 	prices = getPrices(market, amount)
-	console.log(from)
-	console.log(to)
-	console.log(amount)
-	console.log(market)
-	console.log(JSON.stringify(prices))
 	response= []
 	for (var coin in prices[from]) {
 		if (!prices[to].hasOwnProperty(coin)) {
 			continue;
 		}
+		//sell price at exchange is the rate to buy coin
+		buyPrice = prices[from][coin]['sell']
+		//buy price at exchange is the rate to sell coin
+		sellPrice= prices[to][coin]['buy']
+		profitP = ((sellPrice - buyPrice)*100/buyPrice).toFixed(2)
 		response.push({
 			coin: coin,
-			buy: prices[from][coin]['buy'],
-			sell: prices[to][coin]['sell'] 
+			from: from,
+			to: to,
+			market: market,
+			buy: buyPrice,
+			sell: sellPrice,
+			profit: profitP 
 		})
 	}
-	console.log(response)
-	res.json(response)
+	res.json(response.sort((a, b) => b.profit - a.profit))
 })
 
 app.listen(process.env.PORT, function() {
