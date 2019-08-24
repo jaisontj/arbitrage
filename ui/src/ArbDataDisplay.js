@@ -1,85 +1,74 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import Table from 'react-bootstrap/Table';
 
-class ArbDataDisplay extends PureComponent {
-	constructor() {
-		super()
-		this.state = {
-			loading: true,
-			columns: [
-				'market',
-				'coin',
-				'from',
-				'to',
-				'buy',
-				'sell',
-				'profit'
-			],
-			data: [],
-			error: null
-		}
-	}
+const columns = [
+	'market',
+	'coin',
+	'from',
+	'to',
+	'buy',
+	'sell',
+	'profit'
+];
 
-	setError(error) {
-		this.setState({
-			...this.state,
-			error: error
-		})
-	}
+function ArbDataDisplay({
+	from,
+	to,
+	amount,
+	market
+}) {
+	const [data, setData] = React.useState([]);
+	const [error, setError] = React.useState(null);
+	const [loading, setLoading] = React.useState(null);
 
-	componentDidMount(){
-		setInterval(() => this.fetchData(), 1000)
-	}
+	React.useEffect(() => {
+		fetchData()
+		setInterval(() => fetchData(), 1000000)
+	})
 
-	async fetchData() {
+	const fetchData = async () => {
 		try {
-			const response = await fetch(`http://localhost:9999/arbitrage?from=${this.props.from}&to=${this.props.to}&amount=${this.props.amount}&market=${this.props.market}`)
+			setLoading(true);
+			const response = await fetch(`http://localhost:9999/arbitrage?from=${from}&to=${to}&amount=${amount}&market=${market}`);
 			const body = await response.json()
+			setLoading(false);
 			if (response.status === 200) {
-				this.setState({
-					...this.state,
-					data: body,
-					loading: false,
-					error: null
-				})
+				setData(body);
+				setError(null);
 			} else {
-				this.setError("Non 200 response")
+				setError("Non 200 response")
 			}
-		} catch(e) {
-			this.setError("Error Fetching data: " + e)
+		} catch (e) {
+			setError(`Error Fetching data: ${e}`)
 		}
-	} 
-
-	render() {
-		if (this.state.data != null) {
-			return (
-				<Table bordered>
+	}
+	if (data && data.length > 0) {
+		return (
+			<Table bordered>
 				<thead className="thead-dark">
-				<tr>
-				{this.state.columns.map((col,i) => <th key={i} scope="col">{col}</th>)}
-				</tr>
+					<tr>
+						{columns.map((col, i) => <th key={i} scope="col">{col}</th>)}
+					</tr>
 				</thead>
 				<tbody>
-				{
-					this.state.data.map((row, index) => {
-						return (
-							<tr key={index}>
-							{this.state.columns.map((col, i) => <th key={i} scope="row">{row[col]}</th>)}
-							</tr>
-						)
-					})
-				}
+					{
+						data.map((row, index) => {
+							return (
+								<tr key={index}>
+									{columns.map((col, i) => <th key={i} scope="row">{row[col]}</th>)}
+								</tr>
+							)
+						})
+					}
 				</tbody>
-				</Table>
-			)
-		}
-		return (
-			<div>
-			<h1>Loading</h1>
-			</div>
-		)
+			</Table>
+		);
 	}
-
+	return (
+		<div>
+			<h1>No data</h1>
+		</div>
+	);
 }
 
 export default ArbDataDisplay;
