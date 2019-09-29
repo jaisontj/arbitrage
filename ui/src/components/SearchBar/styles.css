@@ -1,0 +1,14 @@
+.searchBar {
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin: 10px 200px;
+    vertical-align: middle;
+}
+.menuItems {
+    margin-left: 5px;
+}
+.inputError {
+    border: 3px solid red;
+}
